@@ -1,11 +1,9 @@
 package com.hodolog.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hodolog.domain.Post;
 import com.hodolog.repository.PostRepository;
 import com.hodolog.request.PostCreate;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,14 +11,22 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 class PostControllerTest {
 
     @Autowired
@@ -32,10 +38,6 @@ class PostControllerTest {
     private PostCreate request;
     private String json;
 
-    @BeforeEach
-    void clear() throws JsonProcessingException {
-        postRepository.deleteAll();
-    }
 
     @Test
     @DisplayName("/posts 요청")
@@ -116,6 +118,26 @@ class PostControllerTest {
                 .andExpect(jsonPath("$.id").value(post.getId()))
                 .andExpect(jsonPath("$.title").value("foo"))
                 .andExpect(jsonPath("$.content").value("bar"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 여러 개 조회")
+    void test5() throws Exception {
+        List<Post> posts = IntStream.range(0, 30)
+                .mapToObj(i -> Post.builder()
+                        .title("title" + i)
+                        .content("content" + i)
+                        .build())
+                .collect(Collectors.toList());
+        postRepository.saveAll(posts);
+
+        mockMvc.perform(get("/posts?page=1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(5)))
+                .andExpect(jsonPath("$[0].title").value("title29"))
+                .andExpect(jsonPath("$[0].content").value("content29"))
                 .andDo(print());
     }
 }

@@ -1,14 +1,17 @@
 package com.hodolog.controller;
 
-import com.hodolog.domain.Post;
 import com.hodolog.request.PostCreate;
+import com.hodolog.response.PostResponse;
 import com.hodolog.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -55,7 +58,13 @@ public class PostController {
     }
 
     @GetMapping("/posts/{postId}")
-    public Post get(@PathVariable Long postId) {
+    public PostResponse get(@PathVariable Long postId) {
         return postService.get(postId);
+    }
+
+    @GetMapping("/posts")
+    public List<PostResponse> getPosts(@PageableDefault(size = 5, sort = "id",
+            direction = Sort.Direction.DESC) Pageable pageable) {
+        return postService.getPosts(pageable);
     }
 }
