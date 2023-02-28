@@ -1,6 +1,7 @@
 package com.hodolog.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,15 +20,23 @@ import java.util.Map;
  * }
  */
 @Getter
-@Builder
-@RequiredArgsConstructor
 public class ErrorResponse {
 
-    private final int code;
-    private final String message;
-    private final Map<String, String> validation;
+    private int code;
+    private String message;
+    private Map<String, String> validation;
+
+    @Builder
+    public ErrorResponse(int code, String message, Map<String, String> validation) {
+        this.code = code;
+        this.message = message;
+        this.validation = validation;
+    }
 
     public void addValidation(String fieldName, String errorMessage) {
+        if (validation == null) {
+            validation = new HashMap<>();
+        }
         this.validation.put(fieldName, errorMessage);
     }
 

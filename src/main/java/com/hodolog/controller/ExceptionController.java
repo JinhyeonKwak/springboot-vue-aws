@@ -1,7 +1,6 @@
 package com.hodolog.controller;
 
 import com.hodolog.exception.HodologException;
-import com.hodolog.exception.InvalidRequest;
 import com.hodolog.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -35,7 +34,7 @@ public class ExceptionController {
 
     @ExceptionHandler(HodologException.class)
     @ResponseBody
-    public ResponseEntity<ErrorResponse> postNotFoundExceptionHandler(HodologException e) {
+    public ResponseEntity<ErrorResponse> hodologExceptionHandler(HodologException e) {
         ErrorResponse response = ErrorResponse.builder()
                 .code(e.getStatusCode().value())
                 .message(e.getMessage())

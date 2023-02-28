@@ -1,0 +1,13 @@
+= 호돌로그 API
+:toc:
+
+== 글 단건 조회
+
+=== 요청
+include::{snippets}/post-get-one/http-request.adoc[]
+
+=== 응답
+include::{snippets}/post-get-one/http-response.adoc[]
+
+=== CURL
+include::{snippets}/post-get-one/curl-request.adoc[]
