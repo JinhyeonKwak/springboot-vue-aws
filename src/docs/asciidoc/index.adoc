@@ -1,13 +1,30 @@
 = 호돌로그 API
+:doctype: book
+:icons: font
+:source-highlighter: highlights
 :toc:
+:toclevels: 2
+:sectlinks:
 
 == 글 단건 조회
 
 === 요청
 include::{snippets}/post-get-one/http-request.adoc[]
+include::{snippets}/post-get-one/path-parameters.adoc[]
 
 === 응답
 include::{snippets}/post-get-one/http-response.adoc[]
+include::{snippets}/post-get-one/response-fields.adoc[]
 
 === CURL
 include::{snippets}/post-get-one/curl-request.adoc[]
+
+== 글 작성
+
+=== 요청
+include::{snippets}/post-create/http-request.adoc[]
+include::{snippets}/post-create/request-fields.adoc[]
+
+=== 응답
+include::{snippets}/post-create/http-response.adoc[]
+
