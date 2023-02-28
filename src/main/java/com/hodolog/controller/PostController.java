@@ -1,14 +1,14 @@
 package com.hodolog.controller;
 
+import com.hodolog.exception.InvalidRequest;
 import com.hodolog.request.PostCreate;
+import com.hodolog.request.PostEdit;
+import com.hodolog.request.PostSearch;
 import com.hodolog.response.PostResponse;
 import com.hodolog.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,6 +37,7 @@ public class PostController {
         // 4. DB에 값을 저장할 때 의도치 않은 오류가 발생할 수 있다.
         // 5. 서버 개발자의 편안함을 위해서
 
+        request.validate();
         postService.write(request);
 
         /*
@@ -63,8 +64,17 @@ public class PostController {
     }
 
     @GetMapping("/posts")
-    public List<PostResponse> getPosts(@PageableDefault(size = 5, sort = "id",
-            direction = Sort.Direction.DESC) Pageable pageable) {
-        return postService.getPosts(pageable);
+    public List<PostResponse> getPosts(@ModelAttribute PostSearch postSearch) {
+        return postService.getPosts(postSearch);
+    }
+
+    @PatchMapping("/posts/{postId}")
+    public PostResponse updatePost(@PathVariable Long postId, @RequestBody @Valid PostEdit postEdit) {
+        return postService.edit(postId, postEdit);
+    }
+
+    @DeleteMapping("/posts/{postId}")
+    public void deletePost(@PathVariable Long postId) {
+        postService.delete(postId);
     }
 }

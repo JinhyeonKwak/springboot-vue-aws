@@ -1,12 +1,15 @@
 package com.hodolog.service;
 
 import com.hodolog.domain.Post;
+import com.hodolog.domain.PostEditor;
+import com.hodolog.exception.PostNotFound;
 import com.hodolog.repository.PostRepository;
 import com.hodolog.request.PostCreate;
+import com.hodolog.request.PostEdit;
+import com.hodolog.request.PostSearch;
 import com.hodolog.response.PostResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,14 +32,34 @@ public class PostService {
     @Transactional(readOnly = true)
     public PostResponse get(Long id) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글입니다"));
+                .orElseThrow(PostNotFound::new);
         return PostResponse.createPostResponse(post);
     }
 
     @Transactional(readOnly = true)
-    public List<PostResponse> getPosts(Pageable pageable) {
-        return postRepository.findAll(pageable).stream()
+    public List<PostResponse> getPosts(PostSearch postSearch) {
+        return postRepository.getList(postSearch).stream()
                 .map(PostResponse::createPostResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public PostResponse edit(Long id, PostEdit postEdit) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(PostNotFound::new);
+        PostEditor.PostEditorBuilder postEditorBuilder = post.toEditor();
+        PostEditor postEditor = postEditorBuilder
+                .title(postEdit.getTitle())
+                .content(postEdit.getContent())
+                .build();
+        post.edit(postEditor);
+        return PostResponse.createPostResponse(post);
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(PostNotFound::new);
+        postRepository.delete(post);
     }
 }

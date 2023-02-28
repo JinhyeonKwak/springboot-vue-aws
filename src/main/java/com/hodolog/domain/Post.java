@@ -1,6 +1,7 @@
 package com.hodolog.domain;
 
 import com.hodolog.request.PostCreate;
+import com.hodolog.request.PostEdit;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,5 +26,16 @@ public class Post {
                 .title(postCreate.getTitle())
                 .content(postCreate.getContent())
                 .build();
+    }
+
+    public PostEditor.PostEditorBuilder toEditor() {
+        return PostEditor.builder()
+                .title(title)
+                .content(content);
+    }
+
+    public void edit(PostEditor postEditor) {
+        title = postEditor.getTitle();
+        content = postEditor.getContent();
     }
 }
