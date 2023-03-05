@@ -1,5 +1,6 @@
 package com.hodolog.controller;
 
+import com.hodolog.config.data.UserSession;
 import com.hodolog.exception.InvalidRequest;
 import com.hodolog.request.PostCreate;
 import com.hodolog.request.PostEdit;
@@ -28,15 +29,26 @@ public class PostController {
 
     private final PostService postService;
 
+    @GetMapping("/foo")
+    public String foo(UserSession userSession) {
+        log.info(">>> {}", userSession.name);
+        return userSession.name;
+    }
+
+    @GetMapping("/bar")
+    public String bar() {
+        return "인증이 필요 없는 페이지";
+    }
+
     @PostMapping("/posts")
     public void post(@RequestBody @Valid PostCreate request) throws Exception {
+
         // 데이터를 검증하는 이유
         // 1. client 개발자가 깜빡할 수 있다. 실수로 값을 안 보낼 수 있다.
         // 2. client bug로 값이 누락될 수 있다.
         // 3. 외부에서 값을 임의로 조작해서 보낼 수 있다.
         // 4. DB에 값을 저장할 때 의도치 않은 오류가 발생할 수 있다.
         // 5. 서버 개발자의 편안함을 위해서
-
         request.validate();
         postService.write(request);
 
