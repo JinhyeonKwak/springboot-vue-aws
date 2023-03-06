@@ -12,11 +12,15 @@ spring:
     web:
       pageable:
         one-indexed-parameters: true
-#  jpa:
+  jpa:
+    defer-datasource-initialization : true
 #    properties:
 #      hibernate:
 #        hbm2ddl:
 #          auto: create-drop
 #    show-sql: true
 #    generate-ddl: true
+  sql:
+    init :
+      mode : always
 

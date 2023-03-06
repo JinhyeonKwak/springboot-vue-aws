@@ -1,7 +1,6 @@
 package com.hodolog.domain;
 
 import com.hodolog.request.PostCreate;
-import com.hodolog.request.PostEdit;
 import jakarta.persistence.*;
 import lombok.*;
 
