@@ -1,6 +1,6 @@
 package com.hodolog.controller;
 
-import com.hodolog.domain.Users;
+import com.hodolog.domain.User;
 import com.hodolog.exception.InvalidSignInInformation;
 import com.hodolog.repository.UserRepository;
 import com.hodolog.request.Login;
@@ -18,12 +18,12 @@ public class AuthController {
     private final UserRepository userRepository;
 
     @PostMapping("/auth/login")
-    public Users login(@RequestBody Login login) {
+    public User login(@RequestBody Login login) {
         // json 아이디/비밀번호
         log.info(">>> login={}", login);
 
         // DB에서 조회
-        Users user = userRepository.findByEmailAndPassword(login.getEmail(), login.getPassword())
+        User user = userRepository.findByEmailAndPassword(login.getEmail(), login.getPassword())
                 .orElseThrow(InvalidSignInInformation::new);
 
         // 토큰을 응답
