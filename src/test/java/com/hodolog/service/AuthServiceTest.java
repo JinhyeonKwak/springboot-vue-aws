@@ -1,6 +1,7 @@
 package com.hodolog.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hodolog.domain.Session;
 import com.hodolog.domain.User;
 import com.hodolog.repository.SessionRepository;
 import com.hodolog.repository.UserRepository;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -73,5 +75,43 @@ class AuthServiceTest {
 
         // 트랜잭션 없음 (getSessions -> lazy loading), test 메서드 레벨에서 트랜잭션 걸어줘야 함
         assertThat(findUser.getSessions().size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("로그인 후 권한이 필요한 페이지에 접속한다. /foo")
+    void test4() throws Exception {
+        User newUser = User.builder().
+                name("호돌맨")
+                .email("hodolman8080@gmail.com")
+                .password("1234")
+                .build();
+        Session session = newUser.addSession();
+        userRepository.save(newUser);
+
+        mockMvc.perform(get("/foo")
+                        .header("Authorization", session.getAccessToken())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("로그인 후 존재하지 않는 세션 값으로 권한이 필요한 페이지에 접속할 수 없다.")
+    void test5() throws Exception {
+        User newUser = User.builder().
+                name("호돌맨")
+                .email("hodolman8080@gmail.com")
+                .password("1234")
+                .build();
+        Session session = newUser.addSession();
+        userRepository.save(newUser);
+
+        mockMvc.perform(get("/foo")
+                        .header("Authorization", session.getAccessToken() + "-o")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
+
     }
 }
